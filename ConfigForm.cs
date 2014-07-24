@@ -30,6 +30,7 @@ using System.IO;
 using System.Configuration;
 using MultiLang;
 using System.Runtime.InteropServices;
+using Microsoft.Win32;
 
 namespace DesktopWallpaperAutoSwitch
 {
@@ -81,6 +82,11 @@ namespace DesktopWallpaperAutoSwitch
         /// </summary>
         bool formInitialized = false;
 
+        /// <summary>
+        /// Whether the window should hide automatically
+        /// </summary>
+        bool shouldAutoHide = false;
+
         /***** CONSTRUCTOR *****/
 
         public ConfigForm()
@@ -88,10 +94,12 @@ namespace DesktopWallpaperAutoSwitch
             InitializeComponent();
             this.btnChooseLandscapeImg.BringToFront();
             this.btnChosePortraitImg.BringToFront();
+            this.Icon = Properties.Resources.appicon;
 
             /* Load Configuration */
             ReadConfig();
             ProcessConfig();
+            SetAutorunState();
 
             /* Load and Set Languages*/
             LoadLanguages();
@@ -104,6 +112,7 @@ namespace DesktopWallpaperAutoSwitch
 
             /* Set flag */
             formInitialized = true;
+
         }
 
         /***** WINDOWS API *****/
@@ -255,11 +264,19 @@ namespace DesktopWallpaperAutoSwitch
              * If illegal, set them to empty string
              */
             string[] validExts = new string[] { ".jpg", ".png", ".jpeg", ".bmp" };
+            bool firstSuccess = false;
+            bool secondSuccess = false;
             if (conf.imgLandscape != "" && File.Exists(conf.imgLandscape))
             {
                 FileInfo fi = new FileInfo(conf.imgLandscape);
                 foreach (string ext in validExts)
-                    if(string.Compare(fi.Extension, ext,ignoreCase:true) == 0) this.lblLandscapeImg.Text = fi.Name;
+                    if (string.Compare(fi.Extension, ext, ignoreCase: true) == 0)
+                    {
+                        this.lblLandscapeImg.Text = fi.Name;
+                        firstSuccess = true;
+                        break;
+                    }
+                if (!firstSuccess) HandleImageNotExist(DesktopOrientation.Landscape);
             }
             else
             {
@@ -269,13 +286,23 @@ namespace DesktopWallpaperAutoSwitch
             {
                 FileInfo fi = new FileInfo(conf.imgPortrait);
                 foreach (string ext in validExts)
-                    if (string.Compare(fi.Extension, ext, ignoreCase: true) == 0) this.lblPortraitImg.Text = fi.Name;
+                    if (string.Compare(fi.Extension, ext, ignoreCase: true) == 0)
+                    {
+                        this.lblPortraitImg.Text = fi.Name;
+                        secondSuccess = true;
+                        break;
+                    }
+                if (!secondSuccess) HandleImageNotExist(DesktopOrientation.Portrait);
             }
             else
             {
                 HandleImageNotExist(DesktopOrientation.Portrait);
             }
             SaveConfig();
+
+            /* Hide window if both images available
+             */
+            if (firstSuccess && secondSuccess) shouldAutoHide = true;
         }
 
         /// <summary>
@@ -458,5 +485,27 @@ namespace DesktopWallpaperAutoSwitch
                 this.notifyIcon1.Text += "Portrait".t(lang);
             }
         }
+
+        /// <summary>
+        /// Set the autorun checkbox
+        /// </summary>
+        private void SetAutorunState()
+        {
+            try
+            {
+                RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+                object v = key.GetValue("co.logu.DWAS", null);
+                if (v != null)
+                {
+                    string s = (string)v;
+                    if (string.Compare(s, Application.ExecutablePath) == 0) this.chkRunWithWindows.Checked = true;
+                }
+            }
+            catch (Exception)
+            {
+                // hmm, yummy
+            }
+        }
+
     }
 }

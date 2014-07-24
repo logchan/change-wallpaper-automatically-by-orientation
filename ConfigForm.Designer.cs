@@ -47,6 +47,7 @@
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.lblOpenfileInfo = new System.Windows.Forms.Label();
             this.comboChooseLanguage = new System.Windows.Forms.ComboBox();
+            this.chkRunWithWindows = new System.Windows.Forms.CheckBox();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -214,11 +215,23 @@
             this.comboChooseLanguage.TabIndex = 11;
             this.comboChooseLanguage.SelectedIndexChanged += new System.EventHandler(this.comboChooseLanguage_SelectedIndexChanged);
             // 
+            // chkRunWithWindows
+            // 
+            this.chkRunWithWindows.AutoSize = true;
+            this.chkRunWithWindows.Location = new System.Drawing.Point(343, 15);
+            this.chkRunWithWindows.Name = "chkRunWithWindows";
+            this.chkRunWithWindows.Size = new System.Drawing.Size(162, 16);
+            this.chkRunWithWindows.TabIndex = 12;
+            this.chkRunWithWindows.Text = "Run when windows starts";
+            this.chkRunWithWindows.UseVisualStyleBackColor = true;
+            this.chkRunWithWindows.CheckedChanged += new System.EventHandler(this.chkRunWithWindows_CheckedChanged);
+            // 
             // ConfigForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(517, 184);
+            this.Controls.Add(this.chkRunWithWindows);
             this.Controls.Add(this.comboChooseLanguage);
             this.Controls.Add(this.lblOpenfileInfo);
             this.Controls.Add(this.lblMinimizeInfo);
@@ -233,8 +246,11 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "ConfigForm";
+            this.ShowInTaskbar = false;
             this.Text = "Form1";
+            this.WindowState = System.Windows.Forms.FormWindowState.Minimized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ConfigForm_FormClosing);
+            this.Shown += new System.EventHandler(this.ConfigForm_Shown);
             this.SizeChanged += new System.EventHandler(this.ConfigForm_SizeChanged);
             this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -262,6 +278,7 @@
         private System.Windows.Forms.ToolStripMenuItem menuExit;
         private System.Windows.Forms.Label lblOpenfileInfo;
         private System.Windows.Forms.ComboBox comboChooseLanguage;
+        private System.Windows.Forms.CheckBox chkRunWithWindows;
     }
 }
 

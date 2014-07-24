@@ -24,6 +24,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using MultiLang;
+using Microsoft.Win32;
 
 namespace DesktopWallpaperAutoSwitch
 {
@@ -52,7 +53,14 @@ namespace DesktopWallpaperAutoSwitch
 
         private void ConfigForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            this.notifyIcon1.Visible = false;
+            if (MessageBox.Show("Are you sure that you want to close it?".t(lang), "", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == System.Windows.Forms.DialogResult.Yes)
+            {
+                this.notifyIcon1.Visible = false;
+            }
+            else
+            {
+                e.Cancel = true;
+            }
         }
 
         private void menuShowConfigWindow_Click(object sender, EventArgs e)
@@ -74,7 +82,12 @@ namespace DesktopWallpaperAutoSwitch
             if (this.WindowState == FormWindowState.Minimized)
             {
                 this.Hide();
-                this.notifyIcon1.ShowBalloonTip(2000, "Desktop Wallpaper Auto Switch".t(lang), "DBAS still running in background.".t(lang), ToolTipIcon.Info);
+                this.ShowInTaskbar = false;
+                // this.notifyIcon1.ShowBalloonTip(2000, "Desktop Wallpaper Auto Switch".t(lang), "DBAS still running in background.".t(lang), ToolTipIcon.Info);
+            }
+            else
+            {
+                this.ShowInTaskbar = true;
             }
         }
 
@@ -132,6 +145,33 @@ namespace DesktopWallpaperAutoSwitch
                     Application.Restart();
                 }
             });
+        }
+
+        private void chkRunWithWindows_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!formInitialized) return;
+            try
+            {
+                RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+                if (chkRunWithWindows.Checked)
+                {
+                    key.SetValue("co.logu.DWAS", Application.ExecutablePath);
+                }
+                else
+                {
+                    key.DeleteValue("co.logu.DWAS", false);
+                }
+                MessageBox.Show("Operation succeeded.".t(lang), "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception)
+            {
+                // hmm, yummy
+            }
+        }
+
+        private void ConfigForm_Shown(object sender, EventArgs e)
+        {
+            if (!this.shouldAutoHide) this.WindowState = FormWindowState.Normal;
         }
     }
 }
