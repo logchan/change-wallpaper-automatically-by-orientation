@@ -84,4 +84,16 @@
     <key>Are you sure that you want to close it?</key>
     <value>Are you sure that you want to close it?</value>
   </entry>
+  <entry>
+    <key>Fill</key>
+    <value>Fill</value>
+  </entry>
+  <entry>
+    <key>Fit</key>
+    <value>Fit</value>
+  </entry>
+  <entry>
+    <key>Stretch</key>
+    <value>Stretch</value>
+  </entry>
 </multilang>

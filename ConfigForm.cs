@@ -50,7 +50,7 @@ namespace DesktopWallpaperAutoSwitch
     {
         Fill = 10,
         Fit = 6,
-        Scratch = 2
+        Stretch = 2
     }
 
     /// <summary>

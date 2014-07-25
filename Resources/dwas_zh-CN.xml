@@ -84,4 +84,16 @@
     <key>Are you sure that you want to close it?</key>
     <value>你确定要退出吗？</value>
   </entry>
+  <entry>
+    <key>Fill</key>
+    <value>填充</value>
+  </entry>
+  <entry>
+    <key>Fit</key>
+    <value>适合</value>
+  </entry>
+  <entry>
+    <key>Stretch</key>
+    <value>拉伸</value>
+  </entry>
 </multilang>
