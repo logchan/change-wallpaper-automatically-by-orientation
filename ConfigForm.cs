@@ -94,7 +94,7 @@ namespace DesktopWallpaperAutoSwitch
             InitializeComponent();
             this.btnChooseLandscapeImg.BringToFront();
             this.btnChosePortraitImg.BringToFront();
-            this.Icon = Properties.Resources.appicon;
+            this.Icon = Properties.Resources.span_48p;
 
             /* Load Configuration */
             ReadConfig();

@@ -35,7 +35,7 @@
     <StartupObject>DesktopWallpaperAutoSwitch.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\appicon.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\span_48p.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -106,6 +106,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\portrait.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\span_48p.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
