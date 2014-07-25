@@ -25,6 +25,7 @@ using System.Windows.Forms;
 using System.IO;
 using MultiLang;
 using Microsoft.Win32;
+using System.Drawing;
 
 namespace DesktopWallpaperAutoSwitch
 {
@@ -38,7 +39,7 @@ namespace DesktopWallpaperAutoSwitch
         /// </summary>
         private void timer1_Tick(object sender, EventArgs e)
         {
-            DesktopOrientation currentOrientation = GetDesktopOrientation();
+            DesktopOrientation currentOrientation = GetDesktopOrientation(conf.reverse);
             if (currentOrientation != lastOrientation)
             {
                 SetDesktopOriString();
@@ -53,6 +54,7 @@ namespace DesktopWallpaperAutoSwitch
 
         private void ConfigForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            
             if (MessageBox.Show("Are you sure that you want to close it?".t(lang), "", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == System.Windows.Forms.DialogResult.Yes)
             {
                 this.notifyIcon1.Visible = false;
@@ -61,6 +63,7 @@ namespace DesktopWallpaperAutoSwitch
             {
                 e.Cancel = true;
             }
+            
         }
 
         private void menuShowConfigWindow_Click(object sender, EventArgs e)
@@ -83,7 +86,6 @@ namespace DesktopWallpaperAutoSwitch
             {
                 this.Hide();
                 this.ShowInTaskbar = false;
-                // this.notifyIcon1.ShowBalloonTip(2000, "Desktop Wallpaper Auto Switch".t(lang), "DBAS still running in background.".t(lang), ToolTipIcon.Info);
             }
             else
             {
@@ -94,28 +96,6 @@ namespace DesktopWallpaperAutoSwitch
         private void notifyIcon1_DoubleClick(object sender, EventArgs e)
         {
             menuShowConfigWindow_Click(sender, e);
-        }
-
-        private void lblLandscapeImg_Click(object sender, EventArgs e)
-        {
-            if (conf.imgLandscape != "" && File.Exists(conf.imgLandscape))
-                System.Diagnostics.Process.Start(conf.imgLandscape);
-            else
-            {
-                HandleImageNotExist(DesktopOrientation.Landscape);
-                AskforImage(DesktopOrientation.Landscape);
-            }
-        }
-
-        private void lblPortraitImg_Click(object sender, EventArgs e)
-        {
-            if (conf.imgPortrait != "" && File.Exists(conf.imgPortrait))
-                System.Diagnostics.Process.Start(conf.imgPortrait);
-            else
-            {
-                HandleImageNotExist(DesktopOrientation.Portrait);
-                AskforImage(DesktopOrientation.Portrait);
-            }
         }
 
         private void btnChooseLandscapeImg_Click(object sender, EventArgs e)
@@ -134,6 +114,7 @@ namespace DesktopWallpaperAutoSwitch
         private void comboChooseLanguage_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (!formInitialized) return;
+            if (lang.Language == comboChooseLanguage.SelectedItem.ToString()) return;
             languages.ForEach(l =>
             {
                 if (l.Language == comboChooseLanguage.SelectedItem.ToString())
@@ -173,5 +154,93 @@ namespace DesktopWallpaperAutoSwitch
         {
             if (!this.shouldAutoHide) this.WindowState = FormWindowState.Normal;
         }
+
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        /* Handle drag-and-move */
+
+        private Point mPoint = new Point();
+
+        private void lblBgBorder_MouseDown(object sender, MouseEventArgs e)
+        {
+            mPoint.X = e.X;
+            mPoint.Y = e.Y;
+            this.Opacity = 0.7;
+        }
+
+        private void lblBgBorder_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                this.Location = new Point(this.Location.X + e.X - mPoint.X, this.Location.Y + e.Y - mPoint.Y);
+            }
+        }
+
+        private void lblBgBorder_MouseUp(object sender, MouseEventArgs e)
+        {
+            this.Opacity = 1.0;
+        }
+
+        private void btnHideWnd_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Minimized;
+        }
+
+        private void picboxLandscape_Click(object sender, EventArgs e)
+        {
+            if (conf.imgLandscape != "" && File.Exists(conf.imgLandscape))
+                System.Diagnostics.Process.Start(conf.imgLandscape);
+            else
+            {
+                HandleImageNotExist(DesktopOrientation.Landscape);
+                AskforImage(DesktopOrientation.Landscape);
+            }
+        }
+
+        private void picboxPortrait_Click(object sender, EventArgs e)
+        {
+            if (conf.imgPortrait != "" && File.Exists(conf.imgPortrait))
+                System.Diagnostics.Process.Start(conf.imgPortrait);
+            else
+            {
+                HandleImageNotExist(DesktopOrientation.Portrait);
+                AskforImage(DesktopOrientation.Portrait);
+            }
+        }
+
+        private void btnOrientationWrong_Click(object sender, EventArgs e)
+        {
+            conf.reverse = !conf.reverse;
+            SaveConfig();
+        }
+
+        private void lnkHomepage_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(@"http://www.logu.co/dwas/");
+        }
+
+        private void lnkGithub_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(@"https://github.com/logchan/change-wallpaper-automatically-by-orientation/");
+        }
+
+        private void lnkThanks_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(@"https://github.com/logchan/change-wallpaper-automatically-by-orientation/wiki/Special-Thanks");
+        }
+
+        private void btnPicposLandscape_Click(object sender, EventArgs e)
+        {
+            HandlePicposButtonClick(DesktopOrientation.Landscape);
+        }
+
+        private void btnPicposPortrait_Click(object sender, EventArgs e)
+        {
+            HandlePicposButtonClick(DesktopOrientation.Portrait);
+        }
+
     }
 }

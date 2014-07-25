@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<multilang language="中文(zh-CN)">
+  <entry>
+    <key>Desktop Wallpaper Auto Switch</key>
+    <value>桌面背景自动切换</value>
+  </entry>
+  <entry>
+    <key>Desktop Orientation:</key>
+    <value>当前屏幕方向：</value>
+  </entry>
+  <entry>
+    <key>Landscape</key>
+    <value>水平</value>
+  </entry>
+  <entry>
+    <key>Portrait</key>
+    <value>垂直</value>
+  </entry>
+  <entry>
+    <key>Landscape Image</key>
+    <value>水平图片</value>
+  </entry>
+  <entry>
+    <key>Portrait Image</key>
+    <value>垂直图片</value>
+  </entry>
+  <entry>
+    <key>Choose</key>
+    <value>更换</value>
+  </entry>
+  <entry>
+    <key>Hide this window</key>
+    <value>隐藏窗口</value>
+  </entry>
+  <entry>
+    <key>This window will minimize to notification area.</key>
+    <value>这个窗口会最小化到通知区域。</value>
+  </entry>
+  <entry>
+    <key>Show Config Window</key>
+    <value>显示设置窗口</value>
+  </entry>
+  <entry>
+    <key>Exit</key>
+    <value>退出</value>
+  </entry>
+  <entry>
+    <key>Click on the picture to open it.</key>
+    <value>点击图片可以打开预览</value>
+  </entry>
+  <entry>
+    <key>Homepage (check for updates)</key>
+    <value>主页（可查看更新）</value>
+  </entry>
+  <entry>
+    <key>Github (source code)</key>
+    <value>Github（源代码）</value>
+  </entry>
+  <entry>
+    <key>Special Thanks</key>
+    <value>特别鸣谢</value>
+  </entry>
+  <entry>
+    <key>Fix Reversed</key>
+    <value>修正方向</value>
+  </entry>
+  <entry>
+    <key>Failed setting your wallpaper.</key>
+    <value>更换壁纸失败</value>
+  </entry>
+  <entry>
+    <key>Application will now restart for changes to take effect.</key>
+    <value>程序将重新启动以使改变生效。</value>
+  </entry>
+  <entry>
+    <key>Run when windows starts</key>
+    <value>随Windows启动</value>
+  </entry>
+  <entry>
+    <key>Operation succeeded.</key>
+    <value>操作成功。</value>
+  </entry>
+  <entry>
+    <key>Are you sure that you want to close it?</key>
+    <value>你确定要退出吗？</value>
+  </entry>
+</multilang>

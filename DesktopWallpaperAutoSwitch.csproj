@@ -57,9 +57,16 @@
     <Compile Include="ConfigForm.Designer.cs">
       <DependentUpon>ConfigForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ConfigFormConfigManagement.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="ConfigFormEventHandlers.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="ConfigFormLanguageLoading.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DesktopUtilities.cs" />
     <Compile Include="MultiLang.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -90,18 +97,6 @@
     <None Include="Resources\landscape.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="bin\Debug\lang\dbas_en-US.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="bin\Debug\lang\dbas_zh-CN.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="bin\Debug\lang\dwas_en-US.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="bin\Debug\lang\dwas_zh-CN.xml" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\appicon.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -109,6 +104,19 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\span_48p.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\dwas_en-US.xml">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\dwas_zh-CN.xml">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\span_48p_png.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

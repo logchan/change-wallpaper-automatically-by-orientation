@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<multilang language="English(en-US)">
+  <entry>
+    <key>Desktop Wallpaper Auto Switch</key>
+    <value>Desktop Wallpaper Auto Switch</value>
+  </entry>
+  <entry>
+    <key>Desktop Orientation:</key>
+    <value>Desktop Orientation:</value>
+  </entry>
+  <entry>
+    <key>Landscape</key>
+    <value>Landscape</value>
+  </entry>
+  <entry>
+    <key>Portrait</key>
+    <value>Portrait</value>
+  </entry>
+  <entry>
+    <key>Landscape Image</key>
+    <value>Landscape Image</value>
+  </entry>
+  <entry>
+    <key>Portrait Image</key>
+    <value>Portrait Image</value>
+  </entry>
+  <entry>
+    <key>Choose</key>
+    <value>Choose</value>
+  </entry>
+  <entry>
+    <key>Hide this window</key>
+    <value>Hide this window</value>
+  </entry>
+  <entry>
+    <key>This window will minimize to notification area.</key>
+    <value>This window will minimize to notification area.</value>
+  </entry>
+  <entry>
+    <key>Show Config Window</key>
+    <value>Show Config Window</value>
+  </entry>
+  <entry>
+    <key>Exit</key>
+    <value>Exit</value>
+  </entry>
+  <entry>
+    <key>Click on the picture to open it.</key>
+    <value>Click on the picture to open it.</value>
+  </entry>
+  <entry>
+    <key>Homepage (check for updates)</key>
+    <value>Homepage (check for updates)</value>
+  </entry>
+  <entry>
+    <key>Github (source code)</key>
+    <value>Github (source code)</value>
+  </entry>
+  <entry>
+    <key>Special Thanks</key>
+    <value>Special Thanks</value>
+  </entry>
+  <entry>
+    <key>Run when windows starts</key>
+    <value>Run when windows starts</value>
+  </entry>
+  <entry>
+    <key>Fix Reversed</key>
+    <value>Fix Reversed</value>
+  </entry>
+  <entry>
+    <key>Failed setting your wallpaper.</key>
+    <value>Failed setting your wallpaper.</value>
+  </entry>
+  <entry>
+    <key>Application will now restart for changes to take effect.</key>
+    <value>Application will now restart for changes to take effect.</value>
+  </entry>
+  <entry>
+    <key>Operation succeeded.</key>
+    <value>Operation succeeded.</value>
+  </entry>
+  <entry>
+    <key>Are you sure that you want to close it?</key>
+    <value>Are you sure that you want to close it?</value>
+  </entry>
+</multilang>

@@ -44,6 +44,16 @@ namespace DesktopWallpaperAutoSwitch
     }
 
     /// <summary>
+    /// Three picture positions to set
+    /// </summary>
+    public enum PicPos
+    {
+        Fill = 10,
+        Fit = 6,
+        Scratch = 2
+    }
+
+    /// <summary>
     /// Wrap the config of this application
     /// </summary>
     public struct MyConfig
@@ -51,6 +61,10 @@ namespace DesktopWallpaperAutoSwitch
         public string imgLandscape;
         public string imgPortrait;
         public string language;
+        public bool reverse;
+        public PicPos posLandscape;
+        public PicPos posPortrait;
+        public int ver;
     }
 
     public partial class ConfigForm : Form
@@ -87,14 +101,26 @@ namespace DesktopWallpaperAutoSwitch
         /// </summary>
         bool shouldAutoHide = false;
 
+        /// <summary>
+        /// How often should the timer ticks
+        /// </summary>
+        private int timerInterval = 500;
+
         /***** CONSTRUCTOR *****/
 
         public ConfigForm()
         {
             InitializeComponent();
+
+            /* Form layout */
             this.btnChooseLandscapeImg.BringToFront();
             this.btnChosePortraitImg.BringToFront();
             this.Icon = Properties.Resources.span_48p;
+            this.lblBgBorder.SendToBack();
+            this.lblBgBorder.Top = this.lblBgBorder.Left = 0;
+            this.lblBgBorder.Width = this.Width;
+            this.lblBgBorder.Height = this.Height;
+            GetAndSetVersion();
 
             /* Load Configuration */
             ReadConfig();
@@ -107,119 +133,17 @@ namespace DesktopWallpaperAutoSwitch
             SetUIStrings();
 
             /* Init orientation state */
-            lastOrientation = GetDesktopOrientation();
+            lastOrientation = GetDesktopOrientation(conf.reverse);
             SetNotifyIcon();
 
             /* Set flag */
+            this.timer1.Interval = timerInterval;
+            this.timer1.Enabled = true;
             formInitialized = true;
 
         }
 
-        /***** WINDOWS API *****/
-
-        const int SPI_SETDESKWALLPAPER = 20;
-        const int SPIF_UPDATEINIFILE = 0x01;
-        const int SPIF_SENDWININICHANGE = 0x02;
-
-        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        static extern int SystemParametersInfo(int uAction,
-                                                int uParam,
-                                                string lpvParam,
-                                                int fuWinIni);
-
         /***** METHODS *****/
-
-        /// <summary>
-        /// Load language files
-        /// </summary>
-        private void LoadLanguages()
-        {
-            /* Check if language dir exists
-             * 1. If it does, scan it
-             * 2. If it doesn't, create it and write built-in xmls
-             */ 
-            string langPath = Application.StartupPath + @"\lang\";
-            if (Directory.Exists(langPath))
-            {
-                // 1
-                languages = MultiLangEngine.ScanDirectory(langPath);
-            }
-            else
-            {
-                // 2
-                try
-                {
-                    Directory.CreateDirectory(langPath);
-                    WriteDefaultLanguageFiles(langPath);
-                    languages = MultiLangEngine.ScanDirectory(langPath);
-                }
-                catch (Exception)
-                {
-                    MessageBox.Show("Fatal Error: Could neigher find nor create language folder. Using built-in strings.\n严重错误：打开及创建语言文件均失败。将使用内置字符串。", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-            }
-
-            /* See if any language available
-             * 1. If not, try to write built-in xmls
-             */
-            if (languages.Count < 1)
-            {
-                // 1
-                try
-                {
-                    WriteDefaultLanguageFiles(langPath);
-                    languages = MultiLangEngine.ScanDirectory(langPath);
-                }
-                catch (Exception)
-                {
-                    MessageBox.Show("Fatal Error: Could neigher find nor create language folder. Using built-in strings.\n严重错误：创建语言文件失败。将使用内置字符串。", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-            }
-
-            /* Determine the UI language
-             * 1. Add all languages to combo box
-             * 2. Try to use language in config file
-             * 3. Try to use system language, and write config
-             * 4. Use languages[0], and write config
-             */
-            if (languages.Count < 1) return;
-            else
-            {
-
-                // 1
-                MultiLangEngine theLang = null;
-                languages.ForEach(l =>
-                {
-                    this.comboChooseLanguage.Items.Add(l.Language);
-                    if (string.Compare(l.Language, conf.language) == 0) theLang = l;
-                });
-                if (theLang != null)
-                {
-                    // 2
-                    lang = theLang;
-                    return;
-                }
-                else
-                {
-                    // 3
-                    string sysLang = System.Globalization.CultureInfo.CurrentUICulture.Name;
-                    languages.ForEach(l =>
-                    {
-                        if (l.Language.ToLower().Contains(sysLang.ToLower()))
-                            theLang = l;
-                    });
-                    if (theLang != null) lang = theLang;
-                    else
-                    {
-                        // 4
-                        lang = languages[0];
-                    }
-                    return;
-                }
-            }
-        }
 
         /// <summary>
         /// Process the language selection ComboBox after loading languages
@@ -258,6 +182,11 @@ namespace DesktopWallpaperAutoSwitch
         /// </summary>
         private void ProcessConfig()
         {
+            /*
+             * Update for old versions
+             */
+            if(conf.ver != GetCurrentVer()) ProcessOldVersions();
+
             /* For two images loaded:
              * 1. Check if they exist
              * 2. Check their extensions
@@ -272,7 +201,7 @@ namespace DesktopWallpaperAutoSwitch
                 foreach (string ext in validExts)
                     if (string.Compare(fi.Extension, ext, ignoreCase: true) == 0)
                     {
-                        this.lblLandscapeImg.Text = fi.Name;
+                        SetImgPicBgAndText(DesktopOrientation.Landscape);
                         firstSuccess = true;
                         break;
                     }
@@ -288,7 +217,7 @@ namespace DesktopWallpaperAutoSwitch
                 foreach (string ext in validExts)
                     if (string.Compare(fi.Extension, ext, ignoreCase: true) == 0)
                     {
-                        this.lblPortraitImg.Text = fi.Name;
+                        SetImgPicBgAndText(DesktopOrientation.Portrait);
                         secondSuccess = true;
                         break;
                     }
@@ -300,9 +229,46 @@ namespace DesktopWallpaperAutoSwitch
             }
             SaveConfig();
 
-            /* Hide window if both images available
+            /* 
+             * Hide window if both images available, and set current background
              */
-            if (firstSuccess && secondSuccess) shouldAutoHide = true;
+            if (firstSuccess && secondSuccess)
+            {
+                shouldAutoHide = true;
+                SetDesktopWallpaper(GetDesktopOrientation(conf.reverse));
+            }
+
+            /* 
+             * Set picture position button state
+             */
+            this.btnPicposLandscape.Text = conf.posLandscape.ToString();
+            this.btnPicposPortrait.Text = conf.posPortrait.ToString();
+        }
+
+        /// <summary>
+        /// When updated from a old version, do patches accordingly
+        /// </summary>
+        private void ProcessOldVersions()
+        {
+            if (conf.ver < 110)
+            {
+                // remove langpath for pre-1.1.0 version
+                string langpath = Application.StartupPath + @"\lang\";
+                try
+                {
+                    if (Directory.Exists(langpath))
+                    {
+                        Directory.Delete(langpath, true);
+                    }
+                }
+                catch (Exception)
+                {
+                    // skip
+                }
+            }
+
+            conf.ver = GetCurrentVer();
+            SaveConfig();
         }
 
         /// <summary>
@@ -315,11 +281,11 @@ namespace DesktopWallpaperAutoSwitch
             {
                 case DesktopOrientation.Landscape:
                     conf.imgLandscape = "";
-                    this.lblLandscapeImg.Text = "not set".t(lang);
+                    SetImgPicBgAndText(DesktopOrientation.Landscape);
                     break;
                 case DesktopOrientation.Portrait:
                     conf.imgPortrait = "";
-                    this.lblPortraitImg.Text = "not set".t(lang);
+                    SetImgPicBgAndText(DesktopOrientation.Portrait);
                     break;
             }
         }
@@ -341,49 +307,58 @@ namespace DesktopWallpaperAutoSwitch
                     {
                         case DesktopOrientation.Landscape:
                             conf.imgLandscape = path;
-                            this.lblLandscapeImg.Text = new FileInfo(path).Name;
+                            SetImgPicBgAndText(DesktopOrientation.Landscape);
                             break;
                         case DesktopOrientation.Portrait:
                             conf.imgPortrait = path;
-                            this.lblPortraitImg.Text = new FileInfo(path).Name;
+                            SetImgPicBgAndText(DesktopOrientation.Portrait);
                             break;
                     }
                     SaveConfig();
+                    if (orientation == lastOrientation) SetDesktopWallpaper(orientation);
                 }
             }
         }
 
         /// <summary>
-        /// Read configuration file
+        /// Set the picbox of images of specified orientation
         /// </summary>
-        private void ReadConfig()
+        /// <param name="orientation">the orientation of image</param>
+        private void SetImgPicBgAndText(DesktopOrientation orientation)
         {
-            //load configuration
-            if (ConfigurationManager.AppSettings.Count < 1)
+            switch(orientation)
             {
-                //new configuration
-                SaveConfig();
-            }
-            else
-            {
-                //get configuration
-                conf.imgLandscape = (String)ConfigurationManager.AppSettings.GetValues("landscape").GetValue(0);
-                conf.imgPortrait = (String)ConfigurationManager.AppSettings.GetValues("portrait").GetValue(0);
-                conf.language = (String)ConfigurationManager.AppSettings.GetValues("language").GetValue(0);
+                case DesktopOrientation.Landscape:
+                    SetImgContainerBg(this.picboxLandscape, conf.imgLandscape);
+                    break;
+                case DesktopOrientation.Portrait:
+                    SetImgContainerBg(this.picboxPortrait, conf.imgPortrait);
+                    break;
             }
         }
 
         /// <summary>
-        /// Save config to file
+        /// Set the background of picbox
         /// </summary>
-        private void SaveConfig()
+        /// <param name="picbox">the picbox to set</param>
+        /// <param name="path">path of image</param>
+        private void SetImgContainerBg(PictureBox picbox, string path)
         {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings.Clear();
-            config.AppSettings.Settings.Add("landscape", conf.imgLandscape);
-            config.AppSettings.Settings.Add("portrait", conf.imgPortrait);
-            config.AppSettings.Settings.Add("language", conf.language);
-            config.Save();
+            try
+            {
+                if (path != "")
+                {
+                    picbox.BackgroundImage = Image.FromFile(path);
+                }
+                else
+                {
+                    picbox.BackgroundImage = null;
+                }
+            }
+            catch (Exception)
+            {
+                // swallow
+            }
         }
 
         /// <summary>
@@ -409,7 +384,7 @@ namespace DesktopWallpaperAutoSwitch
         /// </summary>
         private void SetDesktopOriString()
         {
-            if (GetDesktopOrientation() == DesktopOrientation.Landscape)
+            if (GetDesktopOrientation(conf.reverse) == DesktopOrientation.Landscape)
             {
                 this.lblDesktopOri.Text = "Landscape".t(lang);
                 this.lblDesktopOri.ForeColor = Color.FromArgb(0, 192, 0);
@@ -425,16 +400,16 @@ namespace DesktopWallpaperAutoSwitch
         /// Get the desktop orientation
         /// </summary>
         /// <returns>current orientation</returns>
-        private DesktopOrientation GetDesktopOrientation()
+        private DesktopOrientation GetDesktopOrientation(bool reverse)
         {
             ScreenOrientation so = SystemInformation.ScreenOrientation;
             if (so == ScreenOrientation.Angle0 || so == ScreenOrientation.Angle180)
             {
-                return DesktopOrientation.Landscape;
+                return (!reverse) ? DesktopOrientation.Landscape : DesktopOrientation.Portrait;
             }
             else
             {
-                return DesktopOrientation.Portrait;
+                return (!reverse) ? DesktopOrientation.Portrait : DesktopOrientation.Landscape;
             }
         }
 
@@ -449,22 +424,33 @@ namespace DesktopWallpaperAutoSwitch
             switch(orientation)
             {
                 case DesktopOrientation.Landscape:
+                    SetDesktopPicPos(conf.posLandscape);
                     path = conf.imgLandscape;
                     break;
                 case DesktopOrientation.Portrait:
+                    SetDesktopPicPos(conf.posPortrait);
                     path = conf.imgPortrait;
                     break;
             }
+            return DesktopUtilities.SetWallpaper(path);
+        }
 
-            if (File.Exists(path))
+        /// <summary>
+        /// Set the picture position of Windows (by setting registry)
+        /// </summary>
+        /// <param name="p">target picture position</param>
+        private void SetDesktopPicPos(PicPos p)
+        {
+            try
             {
-                int result = SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, path, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
-                if (result != 0) return true;
-                else return false;
+                RegistryKey reg = Registry.CurrentUser;
+                reg = reg.OpenSubKey("Control Panel\\desktop", true);
+                reg.SetValue("WallpaperStyle", ((int)p).ToString());
+                reg.Close();
             }
-            else
+            catch (Exception)
             {
-                return false;
+
             }
         }
 
@@ -505,6 +491,74 @@ namespace DesktopWallpaperAutoSwitch
             {
                 // hmm, yummy
             }
+        }
+
+        /// <summary>
+        /// Get and set version to the label
+        /// </summary>
+        private void GetAndSetVersion()
+        {
+            System.Diagnostics.FileVersionInfo ver = System.Diagnostics.FileVersionInfo.GetVersionInfo(System.Windows.Forms.Application.ExecutablePath);
+            this.lblVersion.Text = String.Format("{0}.{1}.{2}", ver.FileMajorPart, ver.FileMinorPart, ver.FileBuildPart);
+        }
+
+        /// <summary>
+        /// Change picture position setting of a image (in a routine)
+        /// </summary>
+        /// <param name="orientation"></param>
+        private void HandlePicposButtonClick(DesktopOrientation orientation)
+        {
+            int state = 0;
+            PicPos[] poss = Enum.GetValues(typeof(PicPos)).Cast<PicPos>().ToArray<PicPos>();
+            switch(orientation)
+            {
+                case DesktopOrientation.Landscape:
+                    state = FindElementIndex<PicPos>(poss, conf.posLandscape, (a, b) => a == b);
+                    state = (state + 1) % poss.Length;
+                    conf.posLandscape = poss[state];
+                    this.btnPicposLandscape.Text = conf.posLandscape.ToString();
+                    break;
+                case DesktopOrientation.Portrait:
+                    state = FindElementIndex<PicPos>(poss, conf.posPortrait, (a, b) => a == b);
+                    state = (state + 1) % poss.Length;
+                    conf.posPortrait = poss[state];
+                    this.btnPicposPortrait.Text = conf.posPortrait.ToString();
+                    break;
+            }
+
+            SaveConfig();
+            // set wallpaper to update immediately
+            if (orientation == lastOrientation)
+            {
+                SetDesktopWallpaper(orientation);
+            }
+        }
+
+        /// <summary>
+        /// Find the index of an element in an array
+        /// </summary>
+        /// <typeparam name="T">The type of array and element</typeparam>
+        /// <param name="array">the array to find in</param>
+        /// <param name="element">the element to find</param>
+        /// <param name="comparator">determines what it means to be equal</param>
+        /// <returns>index if found, -1 if not found</returns>
+        private int FindElementIndex<T>(T[] array, T element, Func<T, T, bool> comparator)
+        {
+            for (int i = 0; i < array.Length; ++i)
+            {
+                if (comparator(array[i], element)) return i;
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Get the current version in integer
+        /// </summary>
+        /// <returns>Version a.b.c -> 100a + 10b + c</returns>
+        private int GetCurrentVer()
+        {
+            System.Diagnostics.FileVersionInfo ver = System.Diagnostics.FileVersionInfo.GetVersionInfo(System.Windows.Forms.Application.ExecutablePath);
+            return (ver.FileMajorPart * 100 + ver.FileMinorPart * 10 + ver.FileBuildPart * 1);
         }
 
     }
