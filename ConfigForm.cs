@@ -516,13 +516,13 @@ namespace DesktopWallpaperAutoSwitch
                     state = FindElementIndex<PicPos>(poss, conf.posLandscape, (a, b) => a == b);
                     state = (state + 1) % poss.Length;
                     conf.posLandscape = poss[state];
-                    this.btnPicposLandscape.Text = conf.posLandscape.ToString();
+                    this.btnPicposLandscape.Text = conf.posLandscape.ToString().t(lang);
                     break;
                 case DesktopOrientation.Portrait:
                     state = FindElementIndex<PicPos>(poss, conf.posPortrait, (a, b) => a == b);
                     state = (state + 1) % poss.Length;
                     conf.posPortrait = poss[state];
-                    this.btnPicposPortrait.Text = conf.posPortrait.ToString();
+                    this.btnPicposPortrait.Text = conf.posPortrait.ToString().t(lang);
                     break;
             }
 
