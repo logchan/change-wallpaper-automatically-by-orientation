@@ -54,7 +54,7 @@ namespace DesktopWallpaperAutoSwitch
 
         private void ConfigForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            
+            /*
             if (MessageBox.Show("Are you sure that you want to close it?".t(lang), "", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == System.Windows.Forms.DialogResult.Yes)
             {
                 this.notifyIcon1.Visible = false;
@@ -63,7 +63,7 @@ namespace DesktopWallpaperAutoSwitch
             {
                 e.Cancel = true;
             }
-            
+            */
         }
 
         private void menuShowConfigWindow_Click(object sender, EventArgs e)
